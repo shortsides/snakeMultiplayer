@@ -1,7 +1,7 @@
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
     cors: {
-        origin: "http://127.0.0.1:8080",
+        origin: "*",
         methods: ["GET", "POST"],
         credentials: true
       }
@@ -104,4 +104,4 @@ function emitGameOver(roomName, winner) {
     io.sockets.in(roomName).emit('gameOver', JSON.stringify({ winner }));
 }
 
-httpServer.listen(3000);
+httpServer.listen(process.env.PORT || 3000);
