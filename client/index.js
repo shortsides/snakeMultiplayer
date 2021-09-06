@@ -54,7 +54,7 @@ function init() {
     ctx = canvas.getContext('2d');
 
     // define background as 600px
-    canvas.width = canvas.height = 800;
+    canvas.width = canvas.height = 600;
 
     // draw background
     ctx.fillStyle = BG_COLOUR;
