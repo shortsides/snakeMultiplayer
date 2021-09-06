@@ -127,8 +127,8 @@ function gameLoop (state) {
 
 function randomFood(state) {
     food = {
-        x: Math.floor(Math.random() * (GRID_SIZE - 2) + 2),
-        y: Math.floor(Math.random() * (GRID_SIZE - 2) + 2),
+        x: Math.floor(Math.random() * GRID_SIZE),
+        y: Math.floor(Math.random() * GRID_SIZE),
     }
 
     // check if the new food is on any of the snake's body cells
