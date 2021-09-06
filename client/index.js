@@ -1,11 +1,16 @@
 const BG_COLOUR = '#231f20';
-const SNAKE_COLOUR_P1 = '#c2c2c2';
+const SNAKE_COLOUR_P1 = 'silver';
 const SNAKE_COLOUR_P2 = 'red'
 const FOOD_COLOUR = '#e66916'
 
 const socket = io('https://quiet-coast-19364.herokuapp.com/', {
     withCredentials: true
 });
+
+// local testing config
+//const socket = io('http://localhost:3000/', {
+//    withCredentials: true
+//});
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
@@ -20,6 +25,7 @@ const newGameBtn = document.getElementById('newGameButton');
 const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
+const gameHeaderH1 = document.getElementById('gameHeaderH1');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
@@ -48,7 +54,7 @@ function init() {
     ctx = canvas.getContext('2d');
 
     // define background as 600px
-    canvas.width = canvas.height = 600;
+    canvas.width = canvas.height = 800;
 
     // draw background
     ctx.fillStyle = BG_COLOUR;
@@ -89,6 +95,15 @@ function paintPlayer(playerState, size, colour) {
     // loop through cells in snake and draw them on canvas
     for (let cell of snake) {
         ctx.fillRect(cell.x * size, cell.y * size, size, size);
+    }
+
+    // update heading for each player
+    if (playerNumber === 1) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
+        gameHeaderH1.style.color = SNAKE_COLOUR_P1;
+    } else if (playerNumber === 2) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
+        gameHeaderH1.style.color = SNAKE_COLOUR_P2;
     }
 }
 

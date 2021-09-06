@@ -1,3 +1,4 @@
+const { pbkdf2 } = require('crypto');
 const { GRID_SIZE } = require('./constants');
 
 module.exports = {
@@ -15,6 +16,7 @@ function initGame() {
 function createGameState () {
     return {
         players: [{
+            name: 'p1',
             pos: {
                 x: 3,
                 y: 10,
@@ -29,6 +31,7 @@ function createGameState () {
                 {x: 3, y: 10},
             ],
         }, {
+            name: 'p2',
             pos: {
                 x: 18,
                 y: 10,
@@ -124,8 +127,8 @@ function gameLoop (state) {
 
 function randomFood(state) {
     food = {
-        x: Math.floor(Math.random() * GRID_SIZE),
-        y: Math.floor(Math.random() * GRID_SIZE),
+        x: Math.floor(Math.random() * (GRID_SIZE - 2) + 2),
+        y: Math.floor(Math.random() * (GRID_SIZE - 2) + 2),
     }
 
     // check if the new food is on any of the snake's body cells
