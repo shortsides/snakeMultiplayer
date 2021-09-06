@@ -1,7 +1,7 @@
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
     cors: {
-        origin: "https://ecstatic-mestorf-e704b0.netlify.app/",
+        origin: true,
         methods: ["GET", "POST"],
         credentials: true
       }
