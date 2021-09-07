@@ -18,6 +18,7 @@ socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('rematchStart', handleRematchStart);
 
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
@@ -26,9 +27,15 @@ const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 const gameHeaderH1 = document.getElementById('gameHeaderH1');
+const rematchButton = document.getElementById('rematchButton');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
+rematchButton.addEventListener('click', rematchGame);
+
+let canvas, ctx;
+let playerNumber;
+let gameActive = false;
 
 function newGame() {
     socket.emit('newGame');
@@ -41,10 +48,10 @@ function joinGame(){
     init();
 }
 
-let canvas, ctx;
-let playerNumber;
-let gameActive = false;
-
+function rematchGame() {
+    const code = gameCodeDisplay.innerText;
+    socket.emit('rematch', code);
+}
 
 function init() {
     initialScreen.style.display = 'none';
@@ -54,7 +61,7 @@ function init() {
     ctx = canvas.getContext('2d');
 
     // define background as 600px
-    canvas.width = canvas.height = 800;
+    canvas.width = canvas.height = 600;
 
     // draw background
     ctx.fillStyle = BG_COLOUR;
@@ -62,6 +69,9 @@ function init() {
 
     document.addEventListener('keydown', keydown);
     gameActive = true;
+
+    // hide rematch button
+    rematchButton.style.display = 'none';
 }
 
 function keydown(e) {
@@ -98,13 +108,13 @@ function paintPlayer(playerState, size, colour) {
     }
 
     // update heading for each player
-    if (playerNumber === 1) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
-        gameHeaderH1.style.color = SNAKE_COLOUR_P1;
-    } else if (playerNumber === 2) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
-        gameHeaderH1.style.color = SNAKE_COLOUR_P2;
-    }
+    //if (playerNumber === 1) {
+    //    gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
+    //    gameHeaderH1.style.color = SNAKE_COLOUR_P1;
+    //} else if (playerNumber === 2) {
+    //    gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
+    //    gameHeaderH1.style.color = SNAKE_COLOUR_P2;
+    //}
 }
 
 function handleInit(number) {
@@ -113,6 +123,7 @@ function handleInit(number) {
 
 function handleGameState(gameState) {
     if (!gameActive) {
+        console.log('game not active');
         return;
     }
     gameState = JSON.parse(gameState);
@@ -126,6 +137,7 @@ function handleGameOver(data) {
     data = JSON.parse(data);
 
     gameActive = false;
+    rematchButton.style.display = 'block';
 
     if (data.winner === playerNumber) {
         alert("You Win!")
@@ -147,6 +159,10 @@ function handleUnknownGame() {
 function handleTooManyPlayers() {
     reset();
     alert("This game is already in progress");
+}
+
+function handleRematchStart() {
+    init();
 }
 
 function reset() {
