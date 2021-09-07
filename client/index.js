@@ -2,6 +2,7 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR_P1 = 'silver';
 const SNAKE_COLOUR_P2 = 'red'
 const FOOD_COLOUR = '#e66916'
+const FOOD2_COLOUR = '#3CB371'
 
 const socket = io('https://quiet-coast-19364.herokuapp.com/');
 
@@ -86,12 +87,15 @@ function paintGame(state) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const food = state.food;
+    const food2 = state.food2;
     const gridsize = state.gridsize;
     const size = canvas.width / gridsize;
 
     // draw food
     ctx.fillStyle = FOOD_COLOUR;
     ctx.fillRect(food.x * size, food.y * size, size, size);
+    ctx.fillStyle = FOOD2_COLOUR;
+    ctx.fillRect(food2.x * size, food2.y * size, size, size);
 
     // draw players
     paintPlayer(state.players[0], size, SNAKE_COLOUR_P1);
