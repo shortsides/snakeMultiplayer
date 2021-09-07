@@ -148,19 +148,32 @@ function randomFood(state) {
     state.food = food;
 }
 
-function getUpdatedVelocity(keyCode) {
-    switch (keyCode) {
-        case 37: { // left
-            return { x: -1, y: 0};
-        }
-        case 38: { // down
-            return { x: 0, y: -1};
-        }
-        case 39: { // right
-            return { x: 1, y: 0};
-        }
-        case 40: { // up
-            return { x: 0, y: 1};
-        }
-    }
+function getUpdatedVelocity(keyCode, prev_vel) {
+
+    const LEFT_KEY = 37;
+    const RIGHT_KEY = 39;
+    const UP_KEY = 40;
+    const DOWN_KEY = 38;
+  
+    const keyPressed = keyCode;
+    const goingUp = prev_vel['y'] === 1;
+    const goingDown = prev_vel['y'] === -1;
+    const goingRight = prev_vel['x'] === 1;  
+    const goingLeft = prev_vel['x'] === -1;
+
+      if (keyPressed === LEFT_KEY && !goingRight) {    
+        return { x: -1, y: 0};
+      }
+  
+      if (keyPressed === UP_KEY && !goingDown) {    
+        return { x: 0, y: 1};
+      }
+  
+      if (keyPressed === RIGHT_KEY && !goingLeft) {    
+        return { x: 1, y: 0};
+      }
+  
+      if (keyPressed === DOWN_KEY && !goingUp) {    
+        return { x: 0, y: -1};
+      }
 }

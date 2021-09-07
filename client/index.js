@@ -133,7 +133,7 @@ function handleGameState(gameState) {
         console.log('game not active');
         return;
     }
-    gameState = JSON.parse(gameState);
+    //gameState = JSON.parse(gameState);
     requestAnimationFrame(() => paintGame(gameState));
 }
 
@@ -141,7 +141,7 @@ function handleGameOver(data) {
     if (!gameActive) {
         return;
     }
-    data = JSON.parse(data);
+    //data = JSON.parse(data);
 
     gameActive = false;
     rematchButton.style.display = 'block';

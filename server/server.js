@@ -117,9 +117,12 @@ io.on("connection", client => {
             return;
         }
 
-        const vel = getUpdatedVelocity(keyCode);
+        prev_vel = state[roomName].players[client.number - 1].vel
+
+        const vel = getUpdatedVelocity(keyCode, prev_vel);
 
         if (vel) {
+            // update velocity to new velocity
             state[roomName].players[client.number - 1].vel = vel;
         }
     }
@@ -140,11 +143,11 @@ function startGameInterval(roomName) {
 }
 
 function emitGameState(roomName, state) {
-    io.sockets.in(roomName).emit('gameState', JSON.stringify(state));
+    io.sockets.in(roomName).emit('gameState', state);
 }
 
 function emitGameOver(roomName, winner) {
-    io.sockets.in(roomName).emit('gameOver', JSON.stringify({ winner }));
+    io.sockets.in(roomName).emit('gameOver', { winner });
 }
 
 httpServer.listen(process.env.PORT || 3000);
