@@ -3,14 +3,10 @@ const SNAKE_COLOUR_P1 = 'silver';
 const SNAKE_COLOUR_P2 = 'red'
 const FOOD_COLOUR = '#e66916'
 
-const socket = io('https://quiet-coast-19364.herokuapp.com/', {
-    withCredentials: true
-});
+const socket = io('https://quiet-coast-19364.herokuapp.com/');
 
 // local testing config
-//const socket = io('http://localhost:3000/', {
-//    withCredentials: true
-//});
+//const socket = io('http://localhost:3000/');
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);

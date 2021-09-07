@@ -1,10 +1,6 @@
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
-    cors: {
-        origin: true,
-        methods: ["GET", "POST"],
-        credentials: true
-      }
+    cors: {origin: true}
 });
 
 const { initGame, gameLoop, getUpdatedVelocity } = require('./game');
@@ -105,7 +101,7 @@ io.on("connection", client => {
     function handleKeydown(keyCode) {
         const roomName = clientRooms[client.id];
 
-        if (!roomName) {
+        if (!roomName || !state[roomName]) {
             return;
         }
 
