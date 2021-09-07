@@ -3,14 +3,14 @@ const SNAKE_COLOUR_P1 = 'silver';
 const SNAKE_COLOUR_P2 = 'red'
 const FOOD_COLOUR = '#e66916'
 
-const socket = io('https://quiet-coast-19364.herokuapp.com/', {
-    withCredentials: true
-});
-
-// local testing config
-//const socket = io('http://localhost:3000/', {
+//const socket = io('https://quiet-coast-19364.herokuapp.com/', {
 //    withCredentials: true
 //});
+
+// local testing config
+const socket = io('http://localhost:3000/', {
+    withCredentials: true
+});
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
@@ -19,6 +19,7 @@ socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('rematchStart', handleRematchStart);
+socket.on('countdown', handleCountdown);
 
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
@@ -27,6 +28,7 @@ const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 const gameHeaderH1 = document.getElementById('gameHeaderH1');
+const gameCodeH1 = document.getElementById('gameCodeH1');
 const rematchButton = document.getElementById('rematchButton');
 
 newGameBtn.addEventListener('click', newGame);
@@ -67,6 +69,9 @@ function init() {
     ctx.fillStyle = BG_COLOUR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
+
+    // activate game
     document.addEventListener('keydown', keydown);
     gameActive = true;
 
@@ -108,13 +113,15 @@ function paintPlayer(playerState, size, colour) {
     }
 
     // update heading for each player
-    //if (playerNumber === 1) {
-    //    gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
-    //    gameHeaderH1.style.color = SNAKE_COLOUR_P1;
-    //} else if (playerNumber === 2) {
-    //    gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
-    //    gameHeaderH1.style.color = SNAKE_COLOUR_P2;
-    //}
+    if (playerNumber === 1) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
+        gameHeaderH1.style.color = SNAKE_COLOUR_P1;
+        gameCodeH1.style.display = "none";
+    } else if (playerNumber === 2) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
+        gameHeaderH1.style.color = SNAKE_COLOUR_P2;
+        gameCodeH1.style.display = "none";
+    }
 }
 
 function handleInit(number) {
@@ -138,6 +145,7 @@ function handleGameOver(data) {
 
     gameActive = false;
     rematchButton.style.display = 'block';
+    document.getElementById("countdown").innerHTML = "GAME OVER";
 
     if (data.winner === playerNumber) {
         alert("You Win!")
@@ -171,4 +179,18 @@ function reset() {
     gameCodeDisplay.innerText = "";
     initialScreen.style.display = "block";
     gameScreen.style.display = "none";
+}
+
+function handleCountdown() {
+    // countdown timer
+    var timeleft = 5;
+    var downloadTimer = setInterval(function(){
+      if(timeleft <= 0){
+        clearInterval(downloadTimer);
+        document.getElementById("countdown").innerHTML = "GAME START";
+      } else {
+        document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+      }
+      timeleft -= 1;
+    }, 1000);
 }

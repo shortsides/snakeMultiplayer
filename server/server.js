@@ -39,7 +39,18 @@ io.on("connection", client => {
         //}
         state[roomName] = initGame();
         io.sockets.in(roomName).emit('rematchStart');
-        startGameInterval(roomName);
+
+        // countdown from 5 seconds
+        io.sockets.in(roomName).emit('countdown'); // client countdown
+
+        var timeleft = 5;
+        var downloadTimer = setInterval(function(){
+          if(timeleft <= 0){
+            clearInterval(downloadTimer);
+            startGameInterval(roomName); // start game
+          }
+          timeleft -= 1;
+        }, 1000);
     }
 
     function handleJoinGame(roomName) {
@@ -64,8 +75,19 @@ io.on("connection", client => {
         client.join(roomName);
         client.number = 2;
         client.emit('init', 2);
-    
-        startGameInterval(roomName);
+
+        // countdown from 5 seconds
+        io.sockets.in(roomName).emit('countdown'); // client countdown
+
+        var timeleft = 5;
+        var downloadTimer = setInterval(function(){
+          if(timeleft <= 0){
+            clearInterval(downloadTimer);
+            startGameInterval(roomName); // start game
+          }
+          timeleft -= 1;
+        }, 1000);
+        
     }
 
     function handleNewGame() {
