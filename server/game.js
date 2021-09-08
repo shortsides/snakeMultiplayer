@@ -6,17 +6,17 @@ module.exports = {
     getUpdatedVelocity,
 }
 
-function initGame() {
-    const state = createGameState();
+function initGame(numberOfPlayers) {
+    const state = createGameState(numberOfPlayers);
     state.food = randomFood(state);
     state.food2 = randomFood(state);
     return state;
 }
 
-function createGameState () {
+function createGameState (numberOfPlayers) {
     return {
         players: [{
-            name: 'p1',
+            name: 1,
             pos: {
                 x: 3,
                 y: 10,
@@ -30,8 +30,11 @@ function createGameState () {
                 {x: 2, y: 10},
                 {x: 3, y: 10},
             ],
+            lives: 3,
+            points: 0,
+            isAlive: true,
         }, {
-            name: 'p2',
+            name: 2,
             pos: {
                 x: 38,
                 y: 30,
@@ -45,6 +48,9 @@ function createGameState () {
                 {x: 39, y: 30},
                 {x: 38, y: 30},
             ],
+            lives: 3,
+            points: 0,
+            isAlive: true,
         }],
         food: {},
         food2: {},
@@ -57,104 +63,112 @@ function gameLoop (state) {
         return;
     }
 
-    const playerOne = state.players[0];
-    const playerTwo = state.players[1];
+    for (player of state.players) {
 
-    // increase player's position by the velocity each frame
-    playerOne.pos.x += playerOne.vel.x;
-    playerOne.pos.y += playerOne.vel.y;
+        if (player.isAlive) {
+            // increase player's position by the velocity each frame
+            player.pos.x += player.vel.x;
+            player.pos.y += player.vel.y;
 
-    playerTwo.pos.x += playerTwo.vel.x;
-    playerTwo.pos.y += playerTwo.vel.y;
-
-    // check if player has hit the edge of the game board i.e. they lost
-    if (playerOne.pos.x < 0 || playerOne.pos.x > GRID_SIZE || playerOne.pos.y < 0 || playerOne.pos.y > GRID_SIZE) {
-        // then player 2 wins
-        console.log("player 1 hit the wall");
-        return 2;
-    }
-
-    if (playerTwo.pos.x < 0 || playerTwo.pos.x > GRID_SIZE || playerTwo.pos.y < 0 || playerTwo.pos.y > GRID_SIZE) {
-        // then player 1 wins
-        console.log("player 2 hit the wall");
-        return 1;
-    }
-
-    // check if player has just eaten food, then make player one size larger
-    if (state.food.x === playerOne.pos.x && state.food.y === playerOne.pos.y) {
-        playerOne.snake.push({ ...playerOne.pos });
-        playerOne.pos.x += playerOne.vel.x;
-        playerOne.pos.y += playerOne.vel.y;
-        // add a new food item
-        state.food = randomFood(state);
-    }
-
-    if (state.food2.x === playerOne.pos.x && state.food2.y === playerOne.pos.y) {
-        playerOne.snake.push({ ...playerOne.pos });
-        playerOne.pos.x += playerOne.vel.x;
-        playerOne.pos.y += playerOne.vel.y;
-        // add a new food item
-        state.food2 = randomFood(state);
-    }
-
-    if (state.food.x === playerTwo.pos.x && state.food.y === playerTwo.pos.y) {
-        playerTwo.snake.push({ ...playerTwo.pos });
-        playerTwo.pos.x += playerTwo.vel.x;
-        playerTwo.pos.y += playerTwo.vel.y;
-        state.food = randomFood(state);
-    }
-
-    if (state.food2.x === playerTwo.pos.x && state.food2.y === playerTwo.pos.y) {
-        playerTwo.snake.push({ ...playerTwo.pos });
-        playerTwo.pos.x += playerTwo.vel.x;
-        playerTwo.pos.y += playerTwo.vel.y;
-        state.food2 = randomFood(state);
-    }
-
-    // check for snake collisions
-    // if player is moving...
-    if (playerOne.vel.x || playerOne.vel.y) {
-        for (let cell of playerOne.snake) {
-            // check if any cells of the player's snake overlap with itself i.e. they lost
-            if (cell.x === playerOne.pos.x && cell.y === playerOne.pos.y) {
-                // then player 2 wins
-                console.log("player 1 hit itself");
-                return 2;
+            // check if player has hit the edge of the game board i.e. they lost
+            if (player.pos.x < 0 || player.pos.x > GRID_SIZE || player.pos.y < 0 || player.pos.y > GRID_SIZE) {
+                // then player loses a life
+                console.log(`player ${player.name} hit the wall`);
+                return loseLife(player, state);
             }
-            // check if player 2's head overlaps with any of player 1's body i.e. collision
-            if (playerTwo.snake[playerTwo.snake.length - 1].x === cell.x && playerTwo.snake[playerTwo.snake.length - 1].y === cell.y) {
-                // then player 1 wins
-                console.log("player 2 hit player 1");
-                return 1;
+            // check if player has just eaten food, then make player one size larger
+            if (state.food.x === player.pos.x && state.food.y === player.pos.y) {
+                player.snake.push({ ...player.pos });
+                player.pos.x += player.vel.x;
+                player.pos.y += player.vel.y;
+                // add a new food item
+                state.food = randomFood(state);
+            }
+            if (state.food2.x === player.pos.x && state.food2.y === player.pos.y) {
+                player.snake.push({ ...player.pos });
+                player.pos.x += player.vel.x;
+                player.pos.y += player.vel.y;
+                state.food2 = randomFood(state);
+            }
+            // if player is moving...
+            // check for snake collisions and move snake on screen
+            if (player.vel.x || player.vel.y) {
+                
+                for (let cell of player.snake) {
+                    // check if any cells of the player's snake overlap with itself i.e. they lost
+                    if (cell.x === player.pos.x && cell.y === player.pos.y) {
+                        // then player loses a life
+                        console.log(`player ${player.name} hit itself`);
+                        return loseLife(player, state);
+                    }
+                    // check if player 2's head overlaps with any of player 1's body i.e. collision
+                    for (let otherPlayer of state.players) {
+                        if (otherPlayer.name === player.name) {
+                            continue;
+                        }
+                        if (otherPlayer.snake[otherPlayer.snake.length - 1].x === cell.x && otherPlayer.snake[otherPlayer.snake.length - 1].y === cell.y) {
+                            // then player 2 loses a life
+                            console.log(`player ${otherPlayer.name} hit player ${player.name}`);
+                            return loseLife(otherPlayer, state);
+                        }
+                    }
+                }
+                // 'move' snake by one cell i.e.
+                // add new cell to head of snake and remove tail cell
+                player.snake.push({ ...player.pos });
+                player.snake.shift();
             }
         }
-        
-        // 'move' snake by one cell i.e.
-        // add new cell to head of snake and remove tail cell
-        playerOne.snake.push({ ...playerOne.pos });
-        playerOne.snake.shift();
     }
-
-    if (playerTwo.vel.x || playerTwo.vel.y) {
-        for (let cell of playerTwo.snake) {
-            if (cell.x === playerTwo.pos.x && cell.y === playerTwo.pos.y) {
-                // then player 1 wins
-                console.log("player 2 hit itself");
-                return 1;
-            }
-            if (playerOne.snake[playerOne.snake.length - 1].x === cell.x && playerOne.snake[playerOne.snake.length - 1].y === cell.y) {
-                // then player 2 wins
-                console.log("player 1 hit player 2");
-                return 2;
-            }
-        }
-
-        playerTwo.snake.push({ ...playerTwo.pos });
-        playerTwo.snake.shift();
-    }
-
     return false;
+}
 
+function loseLife(player, state) {
+    player.lives--;
+    console.log(`player ${player.name} has ${player.lives} live/s left`);
+    player.isAlive = false;
+    if (player.lives > 0) {
+        playerReset(player);
+    } else {
+        return checkWinner(state);
+    }
+}
+
+function playerReset(player) {
+    // wait 1 second
+    var time = 1;
+    var timer = setInterval(function(){
+        if(time <= 0){
+            clearInterval(timer);
+            // reset snake's position, velocity etc
+            player.snake = [
+            {x: 10, y: 10},
+            {x: 11, y: 10},
+            {x: 12, y: 10},];
+            player.pos = {x: 12, y: 10};
+            player.vel = {x: 1, y: 0};
+            player.isAlive = true;
+        }
+        time -= 1
+    }, 1000);
+}
+
+function checkWinner(state) {
+    let losers = [];
+    let alivePlayers = [];
+    for (player of state.players) {
+        if (player.lives < 1) {
+            losers.push(player.name);
+        } else {
+            alivePlayers.push(player.name);
+        }
+    }
+    if (alivePlayers.length === 1) {
+        console.log(`winner is ${alivePlayers}`);
+        return alivePlayers[0];
+    }
+    console.log('no winners yet');
+    return false;
 }
 
 function randomFood(state) {
@@ -163,18 +177,13 @@ function randomFood(state) {
         y: Math.floor(Math.random() * (GRID_SIZE - 4) + 2),
     }
 
-    // check if the new food is on any of the snake's body cells
-    for (let cell of state.players[0].snake) {
-        if (cell.x === food.x && cell.y === food.y) {
-            // recursively call randomFood to generate a different food
-            return randomFood(state);
-        }
-    }
-
-    for (let cell of state.players[1].snake) {
-        if (cell.x === food.x && cell.y === food.y) {
-            // recursively call randomFood to generate a different food
-            return randomFood(state);
+    // check if the new food is on any of the snakes' body cells
+    for (let player of state.players) {
+        for (let cell of player.snake) {
+            if (cell.x === food.x && cell.y === food.y) {
+                // recursively call randomFood to generate a different food
+                return randomFood(state);
+            }
         }
     }
 

@@ -33,7 +33,7 @@ io.on("connection", client => {
             //client.emit('tooManyPlayers');
             //return;
         //}
-        state[roomName] = initGame();
+        state[roomName] = initGame(numClients);
         io.sockets.in(roomName).emit('rematchStart');
 
         // countdown from 5 seconds
@@ -72,6 +72,8 @@ io.on("connection", client => {
         client.number = 2;
         client.emit('init', 2);
 
+        state[roomName] = initGame(numClients);
+
         // countdown from 5 seconds
         io.sockets.in(roomName).emit('countdown'); // client countdown
 
@@ -90,9 +92,6 @@ io.on("connection", client => {
         let roomName = makeid(5);
         clientRooms[client.id] = roomName;
         client.emit('gameCode', roomName);
-
-        state[roomName] = initGame();
-
         client.join(roomName);
         client.number = 1;
         client.emit('init', 1);
