@@ -151,7 +151,7 @@ function gameLoop (state) {
             // check if player has hit the edge of the game board i.e. they lost
             if (player.pos.x < 0 || player.pos.x > GRID_SIZE || player.pos.y < 0 || player.pos.y > GRID_SIZE) {
                 // then player loses a life
-                console.log(`player ${player.name} hit the wall`);
+                console.log(`${player.colour} player hit the wall`);
                 return loseLife(player, state);
             }
             // check if player has just eaten food, then make player one size larger
@@ -159,6 +159,7 @@ function gameLoop (state) {
                 player.snake.push({ ...player.pos });
                 player.pos.x += player.vel.x;
                 player.pos.y += player.vel.y;
+                player.points++ // score a point
                 // add a new food item
                 state.food = randomFood(state);
             }
@@ -166,6 +167,7 @@ function gameLoop (state) {
                 player.snake.push({ ...player.pos });
                 player.pos.x += player.vel.x;
                 player.pos.y += player.vel.y;
+                player.points++
                 state.food2 = randomFood(state);
             }
             // if player is moving...
@@ -176,7 +178,7 @@ function gameLoop (state) {
                     // check if any cells of the player's snake overlap with itself i.e. they lost
                     if (cell.x === player.pos.x && cell.y === player.pos.y) {
                         // then player loses a life
-                        console.log(`player ${player.name} hit itself`);
+                        console.log(`${player.colour} player hit itself`);
                         return loseLife(player, state);
                     }
                     // check if player 2's head overlaps with any of player 1's body i.e. collision
@@ -189,7 +191,7 @@ function gameLoop (state) {
                         }
                         if (otherPlayer.snake[otherPlayer.snake.length - 1].x === cell.x && otherPlayer.snake[otherPlayer.snake.length - 1].y === cell.y) {
                             // then player 2 loses a life
-                            console.log(`player ${otherPlayer.name} hit player ${player.name}`);
+                            console.log(`${otherPlayer.colour} player hit ${player.colour} player`);
                             return loseLife(otherPlayer, state);
                         }
                     }
@@ -206,9 +208,9 @@ function gameLoop (state) {
 
 function loseLife(player, state) {
     player.lives--;
-    console.log(`player ${player.name} has ${player.lives} live/s left`);
+    console.log(`${player.colour} player has ${player.lives} live/s left`);
     player.isAlive = false;
-    if (player.lives > 0) {
+    if (player.lives > -1) {
         playerReset(player);
     } else {
         return checkWinner(state);
@@ -238,7 +240,7 @@ function checkWinner(state) {
     let losers = [];
     let alivePlayers = [];
     for (player of state.players) {
-        if (player.lives < 1) {
+        if (player.lives < 0) {
             losers.push(player.name);
         } else {
             alivePlayers.push(player.name);

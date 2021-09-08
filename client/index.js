@@ -1,9 +1,8 @@
 const BG_COLOUR = '#231f20';
-const SNAKE_COLOUR_P1 = 'silver';
-const SNAKE_COLOUR_P2 = 'red'
-const SNAKE_COLOURS = ['silver', 'red', 'blue', 'pink', 'purple']
-const FOOD_COLOUR = '#e66916'
-const FOOD2_COLOUR = '#3CB371'
+const SNAKE_COLOURS = ['Silver', 'Red', 'Blue', 'Pink', 'Purple'];
+const FOOD_COLOUR = '#e66916';
+const FOOD2_COLOUR = '#3CB371';
+const HEART = '❤️';
 
 //const socket = io('https://quiet-coast-19364.herokuapp.com/');
 
@@ -26,11 +25,13 @@ const newGameBtn = document.getElementById('newGameButton');
 const joinGameBtn = document.getElementById('joinGameButton');
 const gameCodeInput = document.getElementById('gameCodeInput');
 const gameCodeDisplay = document.getElementById('gameCodeDisplay');
-const gameHeaderH1 = document.getElementById('gameHeaderH1');
+const gameHeader = document.getElementById('gameHeader');
 const gameCodeH1 = document.getElementById('gameCodeH1');
 const rematchButton = document.getElementById('rematchButton');
 const startBtn = document.getElementById('startButton');
-const numPlayersJoined = document.getElementById('numPlayersJoined');
+const gameConsole = document.getElementById('gameConsole');
+const livesCount = document.getElementById('livesCount');
+const pointsCount = document.getElementById('pointsCount');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
@@ -113,20 +114,30 @@ function paintGame(state) {
     // update heading for each player
     gameCodeH1.style.display = "none";
     if (playerNumber === 1) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[0]}`;
-        gameHeaderH1.style.color = SNAKE_COLOURS[0];
+        gameHeader.innerText = `${SNAKE_COLOURS[0]} Player`;
+        //gameHeader.style.color = SNAKE_COLOURS[0];
+        livesCount.innerText = `${HEART.repeat(state.players[0].lives)}`;
+        pointsCount.innerText = state.players[0].points;
     } else if (playerNumber === 2) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[1]}`;
-        gameHeaderH1.style.color = SNAKE_COLOURS[1];
+        gameHeader.innerText = `${SNAKE_COLOURS[1]} Player`;
+        //gameHeader.style.color = SNAKE_COLOURS[1];
+        livesCount.innerText = `${HEART.repeat(state.players[1].lives)}`;
+        pointsCount.innerText = state.players[0].points;
     } else if (playerNumber === 3) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[2]}`;
-        gameHeaderH1.style.color = SNAKE_COLOURS[2];
+        gameHeader.innerText = `${SNAKE_COLOURS[2]} Player`;
+        //gameHeader.style.color = SNAKE_COLOURS[2];
+        livesCount.innerText = `${HEART.repeat(state.players[2].lives)}`;
+        pointsCount.innerText = state.players[0].points;
     } else if (playerNumber === 4) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[3]}`;
-        gameHeaderH1.style.color = SNAKE_COLOURS[3];
+        gameHeader.innerText = `${SNAKE_COLOURS[3]} Player`;
+        //gameHeader.style.color = SNAKE_COLOURS[3];
+        livesCount.innerText = `${HEART.repeat(state.players[3].lives)}`;
+        pointsCount.innerText = state.players[0].points;
     } else if (playerNumber === 5) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[4]}`;
-        gameHeaderH1.style.color = SNAKE_COLOURS[4];
+        gameHeader.innerText = `${SNAKE_COLOURS[4]} Player`;
+        //gameHeader.style.color = SNAKE_COLOURS[4];
+        livesCount.innerText = `${HEART.repeat(state.players[4].lives)}`;
+        pointsCount.innerText = state.players[0].points;
     }
 
 }
@@ -144,6 +155,7 @@ function paintPlayer(playerState, size) {
 
 function handleInit(number) {
     playerNumber = number;
+    gameHeader.innerText = `${SNAKE_COLOURS[playerNumber - 1]} Player`;
 }
 
 function handleGameState(gameState) {
@@ -160,12 +172,12 @@ function handleGameOver(data) {
     }
     gameActive = false;
     rematchButton.style.display = 'block';
-    document.getElementById("countdown").innerHTML = "GAME OVER";
+    gameHeader.innerHTML = "GAME OVER";
 
     if (data.winner === playerNumber) {
-        alert("You Win!")
+        gameConsole.innerText = 'You Win!'
     } else {
-        alert("You Lose!")
+        gameConsole.innerText = `${SNAKE_COLOURS[data.winner - 1]} Player Wins`
     }
 }
 
@@ -185,7 +197,7 @@ function handleTooManyPlayers() {
 }
 
 function handleJoinedGame(playerNum) {
-    numPlayersJoined.innerText = `Player ${playerNum} has joined`;
+    gameConsole.innerText = `${SNAKE_COLOURS[playerNum - 1]} player has joined. Total players ${playerNum}.`;
     startBtn.style.display = 'block'; // show start button
 }
 
@@ -203,14 +215,16 @@ function reset() {
 
 function handleCountdown() {
     startBtn.style.display = 'none'; // hide start button
+    gameCodeH1.style.display = 'none';
+    gameConsole.innerText = 'Starting Game...';
     // countdown timer
     var timeleft = 5;
     var downloadTimer = setInterval(function(){
       if(timeleft <= 0){
         clearInterval(downloadTimer);
-        document.getElementById("countdown").innerHTML = "GAME START";
+        gameConsole.innerText = '...';
       } else {
-        document.getElementById("countdown").innerHTML = timeleft + " seconds remaining";
+        gameHeader.innerHTML = timeleft;
       }
       timeleft -= 1;
     }, 1000);
