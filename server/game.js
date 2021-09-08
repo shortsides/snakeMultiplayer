@@ -14,7 +14,7 @@ function initGame(numberOfPlayers) {
 }
 
 function createGameState (numberOfPlayers) {
-    return {
+    let gameState = {
         players: [{
             name: 1,
             pos: {
@@ -56,6 +56,74 @@ function createGameState (numberOfPlayers) {
         food2: {},
         gridsize: GRID_SIZE,
     };
+
+    if (numberOfPlayers === 2) {
+        return gameState;
+    } else if (numberOfPlayers === 3) {
+        gameState.players.push({
+            name: 3,
+            pos: {
+                x: 3,
+                y: 50,
+            },
+            vel: {
+                x: 1,
+                y: 0,
+            },
+            snake: [
+                {x: 1, y: 50},
+                {x: 2, y: 50},
+                {x: 3, y: 50},
+            ],
+            lives: 3,
+            points: 0,
+            isAlive: true,
+        });
+        return gameState;
+    } else if (numberOfPlayers === 4) {
+        gameState.players.push({
+            name: 4,
+            pos: {
+                x: 38,
+                y: 70,
+            },
+            vel: {
+                x: -1,
+                y: 0,
+            },
+            snake: [
+                {x: 40, y: 70},
+                {x: 39, y: 70},
+                {x: 38, y: 70},
+            ],
+            lives: 3,
+            points: 0,
+            isAlive: true,
+        });
+        return gameState;
+    } else if (numberOfPlayers === 5) {
+        gameState.players.push({
+            name: 5,
+            pos: {
+                x: 3,
+                y: 90,
+            },
+            vel: {
+                x: 1,
+                y: 0,
+            },
+            snake: [
+                {x: 1, y: 90},
+                {x: 2, y: 90},
+                {x: 3, y: 90},
+            ],
+            lives: 3,
+            points: 0,
+            isAlive: true,
+        });
+        return gameState;
+    }
+    
 }
 
 function gameLoop (state) {
@@ -105,6 +173,9 @@ function gameLoop (state) {
                     for (let otherPlayer of state.players) {
                         if (otherPlayer.name === player.name) {
                             continue;
+                        }
+                        if (!otherPlayer.isAlive) {
+                            break;
                         }
                         if (otherPlayer.snake[otherPlayer.snake.length - 1].x === cell.x && otherPlayer.snake[otherPlayer.snake.length - 1].y === cell.y) {
                             // then player 2 loses a life

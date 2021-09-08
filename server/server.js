@@ -29,24 +29,14 @@ io.on("connection", client => {
         if (numClients === 0) {
             client.emit('unknownGame');
             return;
-        } //else if (numClients > 1) {
-            //client.emit('tooManyPlayers');
-            //return;
-        //}
-        state[roomName] = initGame(numClients);
-        io.sockets.in(roomName).emit('rematchStart');
+        } else if (numClients > 5) {
+            client.emit('tooManyPlayers');
+            return;
+        }
 
-        // countdown from 5 seconds
-        io.sockets.in(roomName).emit('countdown'); // client countdown
-
-        var timeleft = 5;
-        var downloadTimer = setInterval(function(){
-          if(timeleft <= 0){
-            clearInterval(downloadTimer);
-            startGameInterval(roomName); // start game
-          }
-          timeleft -= 1;
-        }, 1000);
+        state[roomName] = initGame(numClients); // init game on server
+        io.sockets.in(roomName).emit('rematchStart'); // init game for all clients in room
+        handleStartGame(roomName);
     }
 
     function handleJoinGame(roomName) {
@@ -60,23 +50,42 @@ io.on("connection", client => {
         if (numClients === 0) {
             client.emit('unknownGame');
             return;
-        } else if (numClients > 1) {
+        } else if (numClients > 5) {
             client.emit('tooManyPlayers');
             return;
         }
     
-    
         clientRooms[client.id] = roomName;
         client.emit('gameCode', roomName);
+
         client.join(roomName);
-        client.number = 2;
-        client.emit('init', 2);
-
+        numClients = room.size;
+        client.number = numClients;
+        console.log(`player ${client.number} has joined`);
+        client.emit('init', client.number);
+        
+        // start the game
         state[roomName] = initGame(numClients);
+        handleStartGame(roomName);
+    }
 
-        // countdown from 5 seconds
+    function handleNewGame() {
+        let roomName = makeid(5);
+
+        clientRooms[client.id] = roomName;
+        client.emit('gameCode', roomName);
+
+        client.join(roomName);
+        console.log('player 1 has joined');
+        client.number = 1;
+        client.emit('init', 1);
+    }
+
+    function handleStartGame(roomName) {
+        
         io.sockets.in(roomName).emit('countdown'); // client countdown
 
+        // server countdown
         var timeleft = 5;
         var downloadTimer = setInterval(function(){
           if(timeleft <= 0){
@@ -85,16 +94,6 @@ io.on("connection", client => {
           }
           timeleft -= 1;
         }, 1000);
-        
-    }
-
-    function handleNewGame() {
-        let roomName = makeid(5);
-        clientRooms[client.id] = roomName;
-        client.emit('gameCode', roomName);
-        client.join(roomName);
-        client.number = 1;
-        client.emit('init', 1);
     }
 
     function handleKeydown(keyCode) {
