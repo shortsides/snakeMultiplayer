@@ -1,6 +1,7 @@
 const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR_P1 = 'silver';
 const SNAKE_COLOUR_P2 = 'red'
+const SNAKE_COLOURS = ['silver', 'red', 'blue', 'pink', 'purple']
 const FOOD_COLOUR = '#e66916'
 const FOOD2_COLOUR = '#3CB371'
 
@@ -15,8 +16,9 @@ socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
-socket.on('rematchStart', handleRematchStart);
+socket.on('gameStart', handleGameStart);
 socket.on('countdown', handleCountdown);
+socket.on('joinedGame', handleJoinedGame);
 
 const gameScreen = document.getElementById('gameScreen');
 const initialScreen = document.getElementById('initialScreen');
@@ -27,10 +29,13 @@ const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 const gameHeaderH1 = document.getElementById('gameHeaderH1');
 const gameCodeH1 = document.getElementById('gameCodeH1');
 const rematchButton = document.getElementById('rematchButton');
+const startBtn = document.getElementById('startButton');
+const numPlayersJoined = document.getElementById('numPlayersJoined');
 
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
 rematchButton.addEventListener('click', rematchGame);
+startBtn.addEventListener('click', startGame);
 
 let canvas, ctx;
 let playerNumber;
@@ -52,6 +57,11 @@ function rematchGame() {
     socket.emit('rematch', code);
 }
 
+function startGame() {
+    const code = gameCodeDisplay.innerText;
+    socket.emit('startGame', code);
+}
+
 function init() {
     initialScreen.style.display = 'none';
     gameScreen.style.display = 'block';
@@ -65,8 +75,6 @@ function init() {
     // draw background
     ctx.fillStyle = BG_COLOUR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-
 
     // activate game
     document.addEventListener('keydown', keydown);
@@ -98,29 +106,39 @@ function paintGame(state) {
     ctx.fillRect(food2.x * size, food2.y * size, size, size);
 
     // draw players
-    paintPlayer(state.players[0], size, SNAKE_COLOUR_P1);
-    paintPlayer(state.players[1], size, SNAKE_COLOUR_P2);
+    for (let player of state.players) {
+        paintPlayer(player, size);
+    }
+
+    // update heading for each player
+    gameCodeH1.style.display = "none";
+    if (playerNumber === 1) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[0]}`;
+        gameHeaderH1.style.color = SNAKE_COLOURS[0];
+    } else if (playerNumber === 2) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[1]}`;
+        gameHeaderH1.style.color = SNAKE_COLOURS[1];
+    } else if (playerNumber === 3) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[2]}`;
+        gameHeaderH1.style.color = SNAKE_COLOURS[2];
+    } else if (playerNumber === 4) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[3]}`;
+        gameHeaderH1.style.color = SNAKE_COLOURS[3];
+    } else if (playerNumber === 5) {
+        gameHeaderH1.innerText = `You are ${SNAKE_COLOURS[4]}`;
+        gameHeaderH1.style.color = SNAKE_COLOURS[4];
+    }
+
 }
 
-function paintPlayer(playerState, size, colour) {
+function paintPlayer(playerState, size) {
     const snake = playerState.snake;
 
-    ctx.fillStyle = colour;
+    ctx.fillStyle = playerState.colour;
 
     // loop through cells in snake and draw them on canvas
     for (let cell of snake) {
         ctx.fillRect(cell.x * size, cell.y * size, size, size);
-    }
-
-    // update heading for each player
-    if (playerNumber === 1) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P1}`;
-        gameHeaderH1.style.color = SNAKE_COLOUR_P1;
-        gameCodeH1.style.display = "none";
-    } else if (playerNumber === 2) {
-        gameHeaderH1.innerText = `You are ${SNAKE_COLOUR_P2}`;
-        gameHeaderH1.style.color = SNAKE_COLOUR_P2;
-        gameCodeH1.style.display = "none";
     }
 }
 
@@ -133,7 +151,6 @@ function handleGameState(gameState) {
         console.log('game not active');
         return;
     }
-    //gameState = JSON.parse(gameState);
     requestAnimationFrame(() => paintGame(gameState));
 }
 
@@ -141,8 +158,6 @@ function handleGameOver(data) {
     if (!gameActive) {
         return;
     }
-    //data = JSON.parse(data);
-
     gameActive = false;
     rematchButton.style.display = 'block';
     document.getElementById("countdown").innerHTML = "GAME OVER";
@@ -169,7 +184,12 @@ function handleTooManyPlayers() {
     alert("This game is already in progress");
 }
 
-function handleRematchStart() {
+function handleJoinedGame(playerNum) {
+    numPlayersJoined.innerText = `Player ${playerNum} has joined`;
+    startBtn.style.display = 'block'; // show start button
+}
+
+function handleGameStart() {
     init();
 }
 
@@ -182,6 +202,7 @@ function reset() {
 }
 
 function handleCountdown() {
+    startBtn.style.display = 'none'; // hide start button
     // countdown timer
     var timeleft = 5;
     var downloadTimer = setInterval(function(){

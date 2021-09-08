@@ -17,6 +17,7 @@ io.on("connection", client => {
     client.on('newGame', handleNewGame);
     client.on('joinGame', handleJoinGame);
     client.on('rematch', handleRematch);
+    client.on('startGame', handleStartGame);
 
     function handleRematch(roomName){
         const room = io.sockets.adapter.rooms.get(roomName);
@@ -34,8 +35,7 @@ io.on("connection", client => {
             return;
         }
 
-        state[roomName] = initGame(numClients); // init game on server
-        io.sockets.in(roomName).emit('rematchStart'); // init game for all clients in room
+        console.log('starting rematch');
         handleStartGame(roomName);
     }
 
@@ -63,10 +63,7 @@ io.on("connection", client => {
         client.number = numClients;
         console.log(`player ${client.number} has joined`);
         client.emit('init', client.number);
-        
-        // start the game
-        state[roomName] = initGame(numClients);
-        handleStartGame(roomName);
+        io.sockets.in(roomName).emit('joinedGame', client.number);
     }
 
     function handleNewGame() {
@@ -82,6 +79,12 @@ io.on("connection", client => {
     }
 
     function handleStartGame(roomName) {
+        const room = io.sockets.adapter.rooms.get(roomName);
+        numClients = room.size;
+
+        console.log(`starting game with ${numClients} players`);
+        state[roomName] = initGame(numClients); // init game on server
+        io.sockets.in(roomName).emit('gameStart'); // init game for all clients in room
         
         io.sockets.in(roomName).emit('countdown'); // client countdown
 
@@ -110,7 +113,7 @@ io.on("connection", client => {
             console.error(e);
             return;
         }
-
+        
         prev_vel = state[roomName].players[client.number - 1].vel
 
         const vel = getUpdatedVelocity(keyCode, prev_vel);

@@ -17,6 +17,7 @@ function createGameState (numberOfPlayers) {
     let gameState = {
         players: [{
             name: 1,
+            colour: 'silver',
             pos: {
                 x: 3,
                 y: 10,
@@ -35,18 +36,19 @@ function createGameState (numberOfPlayers) {
             isAlive: true,
         }, {
             name: 2,
+            colour: 'red',
             pos: {
                 x: 38,
-                y: 30,
+                y: 20,
             },
             vel: {
                 x: -1,
                 y: 0,
             },
             snake: [
-                {x: 40, y: 30},
-                {x: 39, y: 30},
-                {x: 38, y: 30},
+                {x: 40, y: 20},
+                {x: 39, y: 20},
+                {x: 38, y: 20},
             ],
             lives: 3,
             points: 0,
@@ -57,73 +59,81 @@ function createGameState (numberOfPlayers) {
         gridsize: GRID_SIZE,
     };
 
+    const player3 = {
+        name: 3,
+        colour: 'lightskyblue',
+        pos: {
+            x: 3,
+            y: 30,
+        },
+        vel: {
+            x: 1,
+            y: 0,
+        },
+        snake: [
+            {x: 1, y: 30},
+            {x: 2, y: 30},
+            {x: 3, y: 30},
+        ],
+        lives: 3,
+        points: 0,
+        isAlive: true,
+    };
+
+    const player4 = {
+        name: 4,
+        colour: 'pink',
+        pos: {
+            x: 38,
+            y: 40,
+        },
+        vel: {
+            x: -1,
+            y: 0,
+        },
+        snake: [
+            {x: 40, y: 40},
+            {x: 39, y: 40},
+            {x: 38, y: 40},
+        ],
+        lives: 3,
+        points: 0,
+        isAlive: true,
+    };
+
+    const player5 = {
+        name: 5,
+        colour: 'blueviolet',
+        pos: {
+            x: 3,
+            y: 40,
+        },
+        vel: {
+            x: 1,
+            y: 0,
+        },
+        snake: [
+            {x: 1, y: 40},
+            {x: 2, y: 40},
+            {x: 3, y: 40},
+        ],
+        lives: 3,
+        points: 0,
+        isAlive: true,
+    };
+    
     if (numberOfPlayers === 2) {
         return gameState;
     } else if (numberOfPlayers === 3) {
-        gameState.players.push({
-            name: 3,
-            pos: {
-                x: 3,
-                y: 50,
-            },
-            vel: {
-                x: 1,
-                y: 0,
-            },
-            snake: [
-                {x: 1, y: 50},
-                {x: 2, y: 50},
-                {x: 3, y: 50},
-            ],
-            lives: 3,
-            points: 0,
-            isAlive: true,
-        });
+        gameState.players.push(player3);
         return gameState;
     } else if (numberOfPlayers === 4) {
-        gameState.players.push({
-            name: 4,
-            pos: {
-                x: 38,
-                y: 70,
-            },
-            vel: {
-                x: -1,
-                y: 0,
-            },
-            snake: [
-                {x: 40, y: 70},
-                {x: 39, y: 70},
-                {x: 38, y: 70},
-            ],
-            lives: 3,
-            points: 0,
-            isAlive: true,
-        });
+        gameState.players.push(player3, player4);
         return gameState;
     } else if (numberOfPlayers === 5) {
-        gameState.players.push({
-            name: 5,
-            pos: {
-                x: 3,
-                y: 90,
-            },
-            vel: {
-                x: 1,
-                y: 0,
-            },
-            snake: [
-                {x: 1, y: 90},
-                {x: 2, y: 90},
-                {x: 3, y: 90},
-            ],
-            lives: 3,
-            points: 0,
-            isAlive: true,
-        });
+        gameState.players.push(player3, player4, player5);
         return gameState;
     }
-    
 }
 
 function gameLoop (state) {
