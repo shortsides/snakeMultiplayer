@@ -111,6 +111,9 @@ function paintGame(state) {
         paintPlayer(player, size);
     }
 
+    // display any messages
+    gameConsole.innerText = state.message;
+
     // update heading for each player
     gameCodeH1.style.display = "none";
     if (playerNumber === 1) {
@@ -224,7 +227,8 @@ function handleCountdown() {
         clearInterval(downloadTimer);
         gameConsole.innerText = '...';
       } else {
-        gameHeader.innerHTML = timeleft;
+        //gameHeader.innerHTML = timeleft;
+        gameConsole.innerText = 'Starting Game... ' + timeleft;
       }
       timeleft -= 1;
     }, 1000);

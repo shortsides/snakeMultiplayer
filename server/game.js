@@ -18,6 +18,7 @@ function createGameState (numberOfPlayers) {
         players: [{
             name: 1,
             colour: 'silver',
+            label: 'Silver Player',
             pos: {
                 x: 3,
                 y: 10,
@@ -37,6 +38,7 @@ function createGameState (numberOfPlayers) {
         }, {
             name: 2,
             colour: 'red',
+            label: 'Red Player',
             pos: {
                 x: 38,
                 y: 20,
@@ -56,12 +58,14 @@ function createGameState (numberOfPlayers) {
         }],
         food: {},
         food2: {},
+        message: '...',
         gridsize: GRID_SIZE,
     };
 
     const player3 = {
         name: 3,
         colour: 'lightskyblue',
+        label: 'Blue Player',
         pos: {
             x: 3,
             y: 30,
@@ -83,6 +87,7 @@ function createGameState (numberOfPlayers) {
     const player4 = {
         name: 4,
         colour: 'pink',
+        label: 'Pink Player',
         pos: {
             x: 38,
             y: 40,
@@ -104,6 +109,7 @@ function createGameState (numberOfPlayers) {
     const player5 = {
         name: 5,
         colour: 'blueviolet',
+        label: 'Purple Player',
         pos: {
             x: 3,
             y: 40,
@@ -208,11 +214,14 @@ function gameLoop (state) {
 
 function loseLife(player, state) {
     player.lives--;
-    console.log(`${player.colour} player has ${player.lives} live/s left`);
+    console.log(`${player.label} has ${player.lives} live/s left`);
+    state.message = `${player.label} lost a life`;
     player.isAlive = false;
     if (player.lives > -1) {
         playerReset(player);
     } else {
+        console.log(`${player.label} died`);
+        state.message = `${player.label} died`;
         return checkWinner(state);
     }
 }
