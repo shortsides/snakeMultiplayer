@@ -4,10 +4,10 @@ const FOOD_COLOUR = '#e66916';
 const FOOD2_COLOUR = '#3CB371';
 const HEART = '❤️';
 
-//const socket = io('https://quiet-coast-19364.herokuapp.com/');
+const socket = io('https://quiet-coast-19364.herokuapp.com/');
 
 // local testing config
-const socket = io('http://localhost:3000/');
+//const socket = io('http://localhost:3000/');
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
